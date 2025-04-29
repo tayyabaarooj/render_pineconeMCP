@@ -10,7 +10,6 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from dotenv import load_dotenv
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 from pinecone import Pinecone
@@ -18,9 +17,6 @@ pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX_NAME)
 
 
-# Set OpenAI key
-openai.api_key = OPENAI_API_KEY
-embedding_model = OpenAIEmbeddings(model="text-embedding-ada-002")
 vectorstore = Pinecone(
     index=index,
     embedding=embedding_model,
@@ -58,7 +54,6 @@ mcp_tool = LangChainTool.from_function(
 )
 
 # 2. LLM for the agent
-llm = ChatOpenAI(model="gpt-4", temperature=0)
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a helpful assistant. Use tools when needed."),
@@ -67,7 +62,7 @@ prompt = ChatPromptTemplate.from_messages([
 ])
 
 # Create the agent with the tool
-agent = create_tool_calling_agent(llm=llm, tools=[mcp_tool], prompt=prompt)
+agent = create_tool_calling_agent( tools=[mcp_tool], prompt=prompt)
 
 # Create agent executor
 agent_executor = AgentExecutor(agent=agent, tools=[mcp_tool], verbose=True)
